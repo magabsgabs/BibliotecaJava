@@ -18,8 +18,8 @@ API REST desenvolvida em Java com Spring Boot para gerenciamento de uma bibliote
 1. Clone o repositório e importe como projeto Maven no Eclipse/IntelliJ.
 2. Execute a classe `BibliotecaApiApplication.java`.
 3. Acesse a documentação e teste as rotas pelo Swagger:
-   - **Swagger UI:** `http://localhost:8080/swagger-ui/index.html`
-   - **Console H2:** `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:bibliotecadb`, User: `sa`, sem senha)
+   - **Swagger UI:** `http://localhost:8081/swagger-ui/index.html`
+   - **Console H2:** `http://localhost:8081/h2-console` (JDBC URL: `jdbc:h2:mem:bibliotecadb`, User: `sa`, sem senha)
 
 ## Principais Endpoints
 - **Usuários & ViaCEP:** `/api/usuarios` e `GET /api/usuarios/cep/{cep}`
