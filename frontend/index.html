@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Biblioteca Digital</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href="img/hk.png">
+</head>
+<body>
+<header class="topbar">
+    <div class="container topbar-inner">
+        <div class="brand">
+            <span><img src="img/png-transparent-hello-kitty.png" alt="imagem da personagem Hello Kitty" width="35" height="50"></span>
+            <div>
+                <h1>Biblioteca Digital</h1>
+            </div>
+        </div>
+
+        <div class="session-bar">
+            <label for="usuarioAtivoSelect">Usuário / Leitor ativo:</label>
+            <select id="usuarioAtivoSelect" title="Selecione um usuário para preencher empréstimos">
+                <option value="">Carregando usuários...</option>
+            </select>
+            <span id="usuarioAtivoBadge" class="badge badge-neutral">Sem seleção</span>
+        </div>
+    </div>
+
+    <nav class="nav-tabs" aria-label="Navegação principal">
+        <div class="container nav-tabs-inner">
+            <button class="tab-btn active" data-tab="livros">Livros &amp; Catálogo</button>
+            <button class="tab-btn" data-tab="emprestimos">Empréstimos &amp; Devoluções</button>
+            <button class="tab-btn" data-tab="multas">Multas</button>
+            <button class="tab-btn" data-tab="usuarios">Usuários &amp; ViaCEP</button>
+            <button class="tab-btn" data-tab="catalogo-apoio">Autores &amp; Categorias</button>
+        </div>
+    </nav>
+</header>
+
+<main class="container main-content">
+    <div id="feedbackBanner" class="feedback-banner hidden" role="alert">
+        <span id="feedbackMessage"></span>
+        <button id="feedbackClose" type="button" class="btn-icon" aria-label="Fechar aviso">✕</button>
+    </div>
+
+    <section id="tab-livros" class="tab-panel active">
+        <div class="section-header">
+            <div>
+                <h2>Livros &amp; Catálogo</h2>
+                <p>Pesquise por título, cadastre novos livros ou gerencie o acervo.</p>
+            </div>
+            <div class="search-group">
+                <input type="text" id="buscaTituloInput" placeholder="Buscar por título (ex.: clean)..." />
+                <button id="btnBuscarLivro" type="button" class="btn btn-primary">Buscar</button>
+                <button id="btnLimparBuscaLivro" type="button" class="btn btn-secondary">Todos</button>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 id="formLivroTitulo">Cadastrar Novo Livro</h3>
+                    <button id="btnCancelarEdicaoLivro" type="button" class="btn btn-ghost hidden">Cancelar edição</button>
+                </div>
+                <form id="formLivro" class="form-grid">
+                    <input type="hidden" id="livroId" />
+
+                    <div class="form-group full">
+                        <label for="livroTitulo">Título *</label>
+                        <input type="text" id="livroTitulo" required placeholder="Ex.: Clean Code" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="livroIsbn">ISBN *</label>
+                        <input type="text" id="livroIsbn" required placeholder="Ex.: 9780132350884" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="livroAnoPublicacao">Ano de Publicação *</label>
+                        <input type="number" id="livroAnoPublicacao" min="1000" max="2099" required placeholder="Ex.: 2008" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="livroQtTotal">Quantidade Total *</label>
+                        <input type="number" id="livroQtTotal" min="0" required placeholder="Ex.: 5" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="livroQtDisponivel">Quantidade Disponível *</label>
+                        <input type="number" id="livroQtDisponivel" min="0" required placeholder="Ex.: 5" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="livroCategoria">Categoria *</label>
+                        <select id="livroCategoria" required>
+                            <option value="">Selecione uma categoria...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="livroAutores">Autor(es) * (segure Ctrl selecionar mais de um)</label>
+                        <select id="livroAutores" multiple size="4" required>
+                            <option value="">Carregando autores...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions full">
+                        <button type="submit" id="btnSalvarLivro" class="btn btn-primary">Salvar Livro</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Acervo de Livros</h3>
+                    <button id="btnAtualizarLivros" type="button" class="btn btn-ghost">Atualizar lista</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título / ISBN</th>
+                            <th>Ano</th>
+                            <th>Estoque (Disp./Total)</th>
+                            <th>Categoria / Autor(es)</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaLivrosBody">
+                        <tr><td colspan="6" class="empty-row">Carregando livros...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-emprestimos" class="tab-panel">
+        <div class="section-header">
+            <div>
+                <h2>Empréstimos &amp; Devoluções</h2>
+                <p>Registre novos empréstimos (baixa automática de estoque) e realize devoluções com cálculo de multa (R$ 2,50/dia de atraso).</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Novo Empréstimo</h3>
+                </div>
+                <form id="formEmprestimo" class="form-grid">
+                    <div class="form-group full">
+                        <label for="emprestimoUsuarioId">Usuário (ID ou Selecione) *</label>
+                        <select id="emprestimoUsuarioSelect" class="mb-6">
+                            <option value="">Opcional: escolher da lista de usuários...</option>
+                        </select>
+                        <input type="number" id="emprestimoUsuarioId" min="1" required placeholder="ID do Usuário (ex.: 1)" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="emprestimoLivroId">Livro (ID ou Selecione) *</label>
+                        <select id="emprestimoLivroSelect" class="mb-6">
+                            <option value="">Opcional: escolher da lista de livros...</option>
+                        </select>
+                        <input type="number" id="emprestimoLivroId" min="1" required placeholder="ID do Livro (ex.: 1)" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="emprestimoDiasPrazo">Dias de Prazo (padrão: 7 dias)</label>
+                        <input type="number" id="emprestimoDiasPrazo" min="1" max="365" placeholder="7" />
+                    </div>
+
+                    <div class="form-actions full">
+                        <button type="submit" class="btn btn-primary">Registrar Empréstimo</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Empréstimos Registrados</h3>
+                    <div class="inline-controls">
+                        <label for="dataDevolucaoSimulada" class="inline-label">Data devolução (teste atraso):</label>
+                        <input type="date" id="dataDevolucaoSimulada" value="2026-12-30" />
+                        <button id="btnAtualizarEmprestimos" type="button" class="btn btn-ghost">Atualizar</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Livro</th>
+                            <th>Prazo / Status</th>
+                            <th>Ação</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaEmprestimosBody">
+                        <tr><td colspan="5" class="empty-row">Carregando empréstimos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-multas" class="tab-panel">
+        <div class="section-header">
+            <div>
+                <h2>Multas por Atraso</h2>
+                <p>Consulte multas geradas e dê baixa nos pagamentos.</p>
+            </div>
+            <div class="inline-controls">
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="filtroApenasPendentes" />
+                    <span>Apenas pendentes (<code>?apenasPendentes=true</code>)</span>
+                </label>
+                <button id="btnAtualizarMultas" type="button" class="btn btn-secondary">Atualizar</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Empréstimo / Usuário</th>
+                        <th>Dias Atraso / Valor</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaMultasBody">
+                    <tr><td colspan="5" class="empty-row">Carregando multas...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-usuarios" class="tab-panel">
+        <div class="section-header">
+            <div>
+                <h2>Usuários &amp; Consulta ViaCEP</h2>
+                <p>Cadastre usuários com busca automática de endereço via CEP.</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Cadastrar Usuário</h3>
+                </div>
+                <form id="formUsuario" class="form-grid">
+                    <div class="form-group full">
+                        <label for="usuarioNome">Nome Completo *</label>
+                        <input type="text" id="usuarioNome" required placeholder="Ex.: Maria Silva" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioEmail">E-mail *</label>
+                        <input type="email" id="usuarioEmail" required placeholder="maria@email.com" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioSenha">Senha *</label>
+                        <input type="password" id="usuarioSenha" required placeholder="••••••••" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioCpf">CPF *</label>
+                        <input type="text" id="usuarioCpf" required placeholder="000.000.000-00" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioRole">Perfil (Role) *</label>
+                        <select id="usuarioRole" required>
+                            <option value="LEITOR">LEITOR</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioCep">CEP * (busca automática)</label>
+                        <div class="input-with-btn">
+                            <input type="text" id="usuarioCep" required placeholder="01001-000" />
+                            <button type="button" id="btnBuscarCep" class="btn btn-secondary btn-sm">Buscar CEP</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="usuarioNumero">Número *</label>
+                        <input type="text" id="usuarioNumero" required placeholder="Ex.: 120" />
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Prévia do Endereço (ViaCEP / Back-end)</label>
+                        <div id="previewEnderecoBox" class="address-preview">
+                            Digite um CEP válido e saia do campo ou clique em "Buscar CEP".
+                        </div>
+                    </div>
+
+                    <div class="form-actions full">
+                        <button type="submit" class="btn btn-primary">Cadastrar Usuário</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Usuários Cadastrados</h3>
+                    <button id="btnAtualizarUsuarios" type="button" class="btn btn-ghost">Atualizar lista</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome / E-mail</th>
+                            <th>CPF / Role</th>
+                            <th>Endereço</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tabelaUsuariosBody">
+                        <tr><td colspan="4" class="empty-row">Carregando usuários...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tab-catalogo-apoio" class="tab-panel">
+        <div class="section-header">
+            <div>
+                <h2>Autores &amp; Categorias</h2>
+                <p>Cadastre autores e categorias para vincular aos livros.</p>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Autores</h3>
+                </div>
+                <form id="formAutor" class="inline-form mb-16">
+                    <input type="text" id="autorNome" required placeholder="Nome do autor (ex.: Martin Fowler)" />
+                    <button type="submit" class="btn btn-primary">Adicionar Autor</button>
+                </form>
+                <ul id="listaAutores" class="simple-list">
+                    <li class="empty-row">Carregando autores...</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Categorias</h3>
+                </div>
+                <form id="formCategoria" class="inline-form mb-16">
+                    <input type="text" id="categoriaNome" required placeholder="Nome da categoria (ex.: Arquitetura)" />
+                    <button type="submit" class="btn btn-primary">Adicionar Categoria</button>
+                </form>
+                <ul id="listaCategorias" class="simple-list">
+                    <li class="empty-row">Carregando categorias...</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="footer">
+
+</footer>
+
+</body>
+</html>
