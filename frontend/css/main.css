@@ -41,7 +41,6 @@ body {
   padding: 0 16px;
 }
 
-/* Header & Navigation */
 .topbar {
   background-color: var(--surface);
   border-bottom: 1px solid var(--border);
@@ -177,7 +176,6 @@ body {
   }
 }
 
-/* Cards & Forms */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -286,7 +284,6 @@ select:focus {
   color: var(--text-muted);
 }
 
-/* Buttons & Badges */
 .btn {
   border: none;
   border-radius: 7px;
@@ -383,7 +380,6 @@ select:focus {
   color: #991b1b;
 }
 
-/* Feedback Banner */
 .feedback-banner {
   display: flex;
   justify-content: space-between;
@@ -418,7 +414,6 @@ select:focus {
   border: 1px solid #93c5fd;
 }
 
-/* Tables & Lists */
 .table-responsive {
   overflow-x: auto;
 }
@@ -475,7 +470,6 @@ select:focus {
   font-size: 0.9rem;
 }
 
-/* Footer */
 .footer {
   background: var(--surface);
   border-top: 1px solid var(--border);
