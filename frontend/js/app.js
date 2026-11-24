@@ -715,3 +715,26 @@ function configurarEventosMultas() {
   document.getElementById("filtroApenasPendentes").addEventListener("change", carregarMultas);
   document.getElementById("btnAtualizarMultas").addEventListener("click", carregarMultas);
 }
+
+async function inicializarAplicacao() {
+  document.getElementById("apiUrlLabel").textContent = API_URL;
+  document.getElementById("feedbackClose").addEventListener("click", esconderFeedback);
+
+  configurarAbas();
+  configurarFormsCatalogoApoio();
+  configurarEventosLivros();
+  configurarEventosUsuarios();
+  configurarEventosEmprestimos();
+  configurarEventosMultas();
+
+  await Promise.all([
+    carregarCategorias(),
+    carregarAutores(),
+    carregarLivros(),
+    carregarUsuarios(),
+    carregarEmprestimos(),
+    carregarMultas(),
+  ]);
+}
+
+document.addEventListener("DOMContentLoaded", inicializarAplicacao);
